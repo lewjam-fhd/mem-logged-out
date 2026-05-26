@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trust-First Discovery Prototype - FamilySearch Memories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .prototype-header {
+            background: #2c5aa0;
+            color: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-bottom: 3px solid #1e4278;
+        }
+
+        .prototype-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .prototype-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .state-controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+        }
+
+        .state-controls h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .state-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .state-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .state-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .state-btn.active {
+            background: #2c5aa0;
+            color: white;
+            border-color: #2c5aa0;
+        }
+
+        .stats-bar {
+            background: #fff3cd;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .screen {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Search Results Styles */
+        .search-header {
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .search-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .results-grid {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .memory-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .memory-card-image {
+            width: 100%;
+            height: 200px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .memory-card-content {
+            padding: 15px;
+        }
+
+        .memory-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .memory-card-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .memory-card-snippet {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Memory Detail Styles */
+        .detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #2c5aa0;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .detail-subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+
+        .detail-image {
+            width: 100%;
+            max-height: 500px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .detail-story {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .detail-metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metadata-item {
+            font-size: 14px;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .metadata-value {
+            color: #333;
+        }
+
+        .metadata-value.clickable {
+            color: #2c5aa0;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .related-section {
+            padding: 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .related-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .related-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .related-item:hover {
+            transform: scale(1.05);
+        }
+
+        .related-thumb {
+            width: 100%;
+            height: 100px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .related-label {
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+            background: white;
+        }
+
+        /* Prompt/Overlay Styles */
+        .prompt-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .prompt-overlay.active {
+            display: flex;
+        }
+
+        .prompt-box {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .prompt-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .prompt-message {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .prompt-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .prompt-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .prompt-btn-primary {
+            background: #2c5aa0;
+            color: white;
+        }
+
+        .prompt-btn-primary:hover {
+            background: #1e4278;
+        }
+
+        .prompt-btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .prompt-btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Gentle Indicator */
+        .gentle-indicator {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            max-width: 350px;
+            border: 2px solid #2c5aa0;
+            z-index: 500;
+        }
+
+        .gentle-indicator.active {
+            display: block;
+        }
+
+        .indicator-message {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .indicator-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .indicator-btn-primary {
+            background: #2c5aa0;
+            color: white;
+        }
+
+        .indicator-btn-secondary {
+            background: transparent;
+            color: #666;
+            text-decoration: underline;
+        }
+
+        .indicator-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* Wireframe annotations */
+        .wireframe-note {
+            background: #fff3cd;
+            padding: 10px;
+            border-left: 3px solid #ffc107;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-header">
+        <h1>🧪 Direction 1: Trust-First Discovery Prototype</h1>
+        <p>Low-fidelity interactive wireframe - Mission-driven, silent initially, partnership-focused prompts</p>
+    </div>
+
+    <div class="state-controls">
+        <h3>Interaction State Simulator:</h3>
+        <div class="state-buttons">
+            <button class="state-btn active" onclick="setState('search')">1. Search Results</button>
+            <button class="state-btn" onclick="setState('memory1')">2. First Memory (0-5 viewed)</button>
+            <button class="state-btn" onclick="setState('memory6')">3. Memory #6 (Gentle Indicator)</button>
+            <button class="state-btn" onclick="setState('memory10-nav')">4. Multi-hop Navigation (10+ viewed)</button>
+            <button class="state-btn" onclick="setState('memory12-time')">5. Partnership Invitation (18+ min)</button>
+            <button class="state-btn" onclick="setState('download')">6. Download Attempt</button>
+        </div>
+        <div class="stats-bar" id="statsBar">
+            Memories viewed: 0 | Time elapsed: 0:00 | Current state: Search Results
+        </div>
+    </div>
+
+    <!-- Search Results Screen -->
+    <div class="screen active" id="screen-search">
+        <div class="search-header">
+            <input type="text" class="search-input" value="Emma Rodriguez Los Angeles 1940s" readonly>
+            <div class="search-meta">18 memories found</div>
+        </div>
+
+        <div class="results-grid">
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    [Factory Photo]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Emma Rodriguez</div>
+                    <div class="memory-card-meta">📅 March 1943</div>
+                    <div class="memory-card-meta">📍 Douglas Aircraft Factory, Long Beach, CA</div>
+                    <div class="memory-card-meta">👤 Uploaded by Maria Chen, 2019</div>
+                    <div class="memory-card-snippet">Emma working at the aircraft factory during World War II...</div>
+                </div>
+            </div>
+
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    [Wedding Photo]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Emma Rodriguez</div>
+                    <div class="memory-card-meta">📅 June 1946</div>
+                    <div class="memory-card-meta">📍 Los Angeles, California</div>
+                    <div class="memory-card-meta">👤 Uploaded by Robert Martinez, 2020</div>
+                    <div class="memory-card-snippet">Emma's wedding day to Carlos Rodriguez...</div>
+                </div>
+            </div>
+
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    [Family Photo]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Emma Rodriguez & Family</div>
+                    <div class="memory-card-meta">📅 December 1952</div>
+                    <div class="memory-card-meta">📍 Los Angeles, California</div>
+                    <div class="memory-card-meta">👤 Uploaded by Maria Chen, 2019</div>
+                    <div class="memory-card-snippet">Emma with her children at their first home...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Trust-First Approach:</strong> Search results are completely open. Rich cards show full metadata. No feature hints or account indicators visible. Building trust through complete transparency.
+        </div>
+    </div>
+
+    <!-- Memory Detail Screen - Early (0-5 memories) -->
+    <div class="screen" id="screen-memory1">
+        <div class="detail-container">
+            <div class="detail-header">
+                <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                <h1 class="detail-title">Emma Rodriguez</h1>
+                <p class="detail-subtitle">Douglas Aircraft Factory, March 1943</p>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-image">
+                    [High-Resolution Factory Photo - Fully Viewable, Zoomable]
+                </div>
+
+                <div class="detail-story">
+                    <strong>Complete Story - Nothing Truncated:</strong><br><br>
+                    Emma Rodriguez worked at the Douglas Aircraft factory in Long Beach during World War II. She was one of thousands of women who joined the workforce while men served overseas. This photo was taken during her shift in 1943. Emma helped build C-47 transport planes and was proud of her contribution to the war effort. She worked alongside her friend Dorothy Martinez, and the two remained close for decades after the war ended.
+                </div>
+
+                <div class="detail-metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Date</div>
+                        <div class="metadata-value">March 1943</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Location</div>
+                        <div class="metadata-value">Douglas Aircraft Factory, Long Beach, CA</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Tagged People</div>
+                        <div class="metadata-value clickable" onclick="alert('One-hop navigation is free - would navigate to Dorothy Martinez profile')">Emma Rodriguez, Dorothy Martinez</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Memory Type</div>
+                        <div class="metadata-value">Photograph</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Uploaded By</div>
+                        <div class="metadata-value">Maria Chen (granddaughter)</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Collection</div>
+                        <div class="metadata-value">WWII Women Workers</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="related-section">
+                <h3 class="related-title">3 more memories of Emma Rodriguez</h3>
+                <div class="related-grid">
+                    <div class="related-item" onclick="setState('memory6')">
+                        <div class="related-thumb">[Wedding 1946]</div>
+                        <div class="related-label">June 1946</div>
+                    </div>
+                    <div class="related-item" onclick="setState('memory6')">
+                        <div class="related-thumb">[Family 1952]</div>
+                        <div class="related-label">December 1952</div>
+                    </div>
+                    <div class="related-item" onclick="setState('memory6')">
+                        <div class="related-thumb">[Story 1968]</div>
+                        <div class="related-label">Written Story</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Memories 1-5:</strong> Completely silent. No prompts, no indicators. Full content access including complete stories, high-res images, all metadata. One-hop relationship navigation is free (can click Dorothy Martinez). Building trust through value demonstration.
+        </div>
+    </div>
+
+    <!-- Memory Detail Screen - Memory #6 (Gentle Indicator Appears) -->
+    <div class="screen" id="screen-memory6">
+        <div class="detail-container">
+            <div class="detail-header">
+                <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                <h1 class="detail-title">Emma & Carlos Rodriguez</h1>
+                <p class="detail-subtitle">Wedding Day, June 1946</p>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-image">
+                    [High-Resolution Wedding Photo - Fully Viewable]
+                </div>
+
+                <div class="detail-story">
+                    <strong>Complete Story - Still Fully Accessible:</strong><br><br>
+                    Emma Rodriguez married Carlos Rodriguez on a beautiful June day in 1946, just after the end of World War II. They met through mutual friends in the Los Angeles community. The ceremony was held at Our Lady of Guadalupe Church, and the reception brought together family and friends from across Southern California. This moment marked the beginning of their 52-year marriage and the foundation of a family that would grow to include three children and eight grandchildren.
+                </div>
+
+                <div class="detail-metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Date</div>
+                        <div class="metadata-value">June 15, 1946</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Location</div>
+                        <div class="metadata-value">Los Angeles, California</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Tagged People</div>
+                        <div class="metadata-value clickable">Emma Rodriguez, Carlos Rodriguez</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gentle Indicator (appears after 6+ memories) -->
+        <div class="gentle-indicator active" id="gentleIndicator">
+            <button class="indicator-close" onclick="document.getElementById('gentleIndicator').classList.remove('active')">×</button>
+            <div class="indicator-message">
+                <strong>You're building quite a discovery journey!</strong><br>
+                Sign in anytime to save your findings and contribute your family's memories.
+            </div>
+            <div class="indicator-actions">
+                <button class="indicator-btn indicator-btn-primary">Create Free Account</button>
+                <button class="indicator-btn indicator-btn-secondary" onclick="document.getElementById('gentleIndicator').classList.remove('active')">Dismiss</button>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Memory #6:</strong> Gentle indicator appears (bottom-right, non-blocking, dismissible). Content still fully accessible. Messaging emphasizes saving and contributing, not unlocking. Tone is encouraging, not pressuring. User can dismiss and continue exploring.
+        </div>
+    </div>
+
+    <!-- Multi-hop Navigation Boundary Screen -->
+    <div class="screen" id="screen-memory10-nav">
+        <div class="detail-container">
+            <div class="detail-header">
+                <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                <h1 class="detail-title">Dorothy Martinez</h1>
+                <p class="detail-subtitle">Emma's friend and coworker</p>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-story" style="background: #f0f8ff; border-left: 3px solid #2c5aa0;">
+                    <strong>Dorothy Martinez Profile</strong><br>
+                    1920 - 2008<br>
+                    Friend and coworker of Emma Rodriguez<br><br>
+                    <em>5 public memories available</em>
+                </div>
+
+                <div class="detail-metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Connection to Emma</div>
+                        <div class="metadata-value">Friend, worked together at Douglas Aircraft</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Tagged People</div>
+                        <div class="metadata-value clickable" onclick="showPrompt('multihop')">Dorothy Martinez, Robert Chen (friend)</div>
+                    </div>
+                </div>
+
+                <div class="wireframe-note" style="margin-top: 20px;">
+                    <strong>Scenario:</strong> User has viewed 10 memories. Can navigate to Dorothy (one-hop from Emma) freely. But clicking Robert Chen (two-hop: Emma → Dorothy → Robert) triggers boundary prompt.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Partnership Invitation Screen (18+ minutes) -->
+    <div class="screen" id="screen-memory12-time">
+        <div class="detail-container">
+            <div class="detail-header">
+                <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                <h1 class="detail-title">Emma's Life Story</h1>
+                <p class="detail-subtitle">Written by Maria Chen (granddaughter), 2019</p>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-story">
+                    <strong>Complete Written Story - Fully Accessible:</strong><br><br>
+                    Emma Rodriguez was born in 1922 in Texas and moved to Los Angeles as a teenager. During World War II, she answered the call to support the war effort by working at the Douglas Aircraft factory in Long Beach. There she met lifelong friends and developed skills that would serve her throughout her life.
+                    <br><br>
+                    After the war, Emma married Carlos Rodriguez and together they built a life in East Los Angeles. They raised three children, ran a small grocery store, and became pillars of their community...
+                    <br><br>
+                    <em>[Story continues - nothing truncated]</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partnership Invitation Prompt (shown after 18+ minutes) -->
+        <div class="prompt-overlay active" id="partnershipPrompt">
+            <div class="prompt-box">
+                <div class="prompt-title">You've spent 18 minutes discovering Emma's story</div>
+                <div class="prompt-message">
+                    FamilySearch is free because people like you contribute and preserve family memories. Every memory you've viewed was shared by someone's family member.
+                    <br><br>
+                    <strong>Create a free account to:</strong>
+                    <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                        <li>Save your research and discoveries</li>
+                        <li>Contribute your family's memories</li>
+                        <li>Help others discover their stories</li>
+                    </ul>
+                    <br>
+                    Join 2 million family historians preserving memories together.
+                </div>
+                <div class="prompt-buttons">
+                    <button class="prompt-btn prompt-btn-primary">Create Free Account</button>
+                    <button class="prompt-btn prompt-btn-secondary" onclick="hidePrompt('partnership')">Continue Browsing</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>18+ Minutes:</strong> Partnership invitation appears (more prominent overlay). Content still accessible in background. Messaging emphasizes mission, community, contribution. Social proof included (2M users). Can dismiss and continue. Tone is invitational, not restrictive.
+        </div>
+    </div>
+
+    <!-- Download Attempt Screen -->
+    <div class="screen" id="screen-download">
+        <div class="detail-container">
+            <div class="detail-header">
+                <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                <h1 class="detail-title">Emma Rodriguez</h1>
+                <p class="detail-subtitle">Douglas Aircraft Factory, March 1943</p>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-image">
+                    [High-Resolution Photo - Viewable in Browser]
+                </div>
+
+                <div class="wireframe-note">
+                    <strong>Scenario:</strong> User clicks download button to save the image file.
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Feature Boundary -->
+        <div class="prompt-overlay active" id="downloadPrompt">
+            <div class="prompt-box">
+                <div class="prompt-title">Download high-resolution images with a free account</div>
+                <div class="prompt-message">
+                    You can view all images in full resolution in your browser. Creating a free account lets you download images for safekeeping and personal use.
+                </div>
+                <div class="prompt-buttons">
+                    <button class="prompt-btn prompt-btn-primary">Create Free Account</button>
+                    <button class="prompt-btn prompt-btn-secondary" onclick="hidePrompt('download')">Continue Viewing</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Feature Boundary:</strong> Downloads require account. Clear explanation: can view full-res in browser, but downloading files requires account. Natural boundary (viewing vs. possession). Non-blocking - can continue viewing.
+        </div>
+    </div>
+
+    <!-- Prompts that can appear on any screen -->
+    <div class="prompt-overlay" id="multihopPrompt">
+        <div class="prompt-box">
+            <div class="prompt-title">You're exploring deep family connections</div>
+            <div class="prompt-message">
+                Create a free account to navigate extended relationships and build family timelines.
+                <br><br>
+                <strong>Your exploration:</strong> Emma Rodriguez → Dorothy Martinez → Robert Chen
+            </div>
+            <div class="prompt-buttons">
+                <button class="prompt-btn prompt-btn-primary">Create Free Account</button>
+                <button class="prompt-btn prompt-btn-secondary" onclick="hidePrompt('multihop')">Continue Browsing</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const states = {
+            'search': { screen: 'screen-search', memories: 0, time: '0:00', desc: 'Search Results' },
+            'memory1': { screen: 'screen-memory1', memories: 1, time: '0:45', desc: 'First Memory (0-5 viewed)' },
+            'memory6': { screen: 'screen-memory6', memories: 6, time: '7:45', desc: 'Memory #6 (Gentle Indicator)' },
+            'memory10-nav': { screen: 'screen-memory10-nav', memories: 10, time: '12:20', desc: 'Multi-hop Navigation' },
+            'memory12-time': { screen: 'screen-memory12-time', memories: 12, time: '18:00', desc: 'Partnership Invitation' },
+            'download': { screen: 'screen-download', memories: 14, time: '21:30', desc: 'Download Attempt' }
+        };
+
+        function setState(stateKey) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+            // Hide all prompts
+            document.querySelectorAll('.prompt-overlay').forEach(p => p.classList.remove('active'));
+
+            // Hide gentle indicator
+            const indicator = document.getElementById('gentleIndicator');
+            if (indicator) indicator.classList.remove('active');
+
+            // Update button states
+            document.querySelectorAll('.state-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show appropriate screen
+            const state = states[stateKey];
+            document.getElementById(state.screen).classList.add('active');
+
+            // Show appropriate prompts based on state
+            if (stateKey === 'memory12-time') {
+                document.getElementById('partnershipPrompt').classList.add('active');
+            } else if (stateKey === 'download') {
+                document.getElementById('downloadPrompt').classList.add('active');
+            }
+
+            // Update stats bar
+            document.getElementById('statsBar').textContent =
+                `Memories viewed: ${state.memories} | Time elapsed: ${state.time} | Current state: ${state.desc}`;
+        }
+
+        function showPrompt(promptName) {
+            document.getElementById(promptName + 'Prompt').classList.add('active');
+        }
+
+        function hidePrompt(promptName) {
+            document.getElementById(promptName + 'Prompt').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

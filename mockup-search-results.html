@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results Mockup - FamilySearch Memories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #F5F5F5;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        /* FamilySearch Header */
+        .fs-header {
+            background: white;
+            border-bottom: 1px solid #E0E0E0;
+            padding: 16px 24px;
+        }
+
+        .fs-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .fs-logo {
+            color: #0051C3;
+            font-size: 20px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .fs-nav {
+            display: flex;
+            gap: 24px;
+            font-size: 15px;
+        }
+
+        .fs-nav a {
+            color: #333;
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .fs-nav a.active {
+            border-bottom-color: #0051C3;
+            color: #0051C3;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-bottom: 1px solid #E0E0E0;
+            padding: 32px 24px 24px;
+        }
+
+        .search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 24px;
+            max-width: 700px;
+        }
+
+        .page-description a {
+            color: #0051C3;
+            text-decoration: none;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            max-width: 800px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #D0D0D0;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0051C3;
+        }
+
+        .search-btn {
+            padding: 12px 32px;
+            background: #0051C3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover {
+            background: #003D99;
+        }
+
+        /* Results Header */
+        .results-header {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            font-size: 15px;
+            color: #666;
+        }
+
+        .view-all-link {
+            color: #0051C3;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Memory Grid */
+        .memories-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 48px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* Memory Card */
+        .memory-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .memory-card-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            background: #E8E8E8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 13px;
+            position: relative;
+        }
+
+        /* Document type indicator */
+        .document-indicator {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 18px;
+        }
+
+        .memory-card-content {
+            padding: 16px;
+        }
+
+        .memory-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .memory-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .memory-card-meta svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        .memory-card-snippet {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            margin-top: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Mockup indicator */
+        .mockup-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #FF6B35;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-badge">📐 MOCKUP FOR APPROVAL</div>
+
+    <!-- FamilySearch Header -->
+    <header class="fs-header">
+        <div class="fs-header-content">
+            <a href="#" class="fs-logo">🌳 FamilySearch</a>
+            <nav class="fs-nav">
+                <a href="#">Family Tree</a>
+                <a href="#" class="active">Memories</a>
+                <a href="#">Search</a>
+                <a href="#">Genealogies</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="search-container">
+            <h1 class="page-title">Memories found for Emma Rodriguez</h1>
+            <p class="page-description">
+                Memories may be photos, stories, documents or even audio clips that other users have uploaded to the Family Tree. <a href="#">Learn More</a>
+            </p>
+            <div class="search-bar">
+                <input type="text" class="search-input" value="Emma Rodriguez Los Angeles 1940s" readonly>
+                <button class="search-btn">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Header -->
+    <div class="results-header">
+        <div class="results-count">Showing 18 memories</div>
+        <a href="#" class="view-all-link">VIEW ALL 18</a>
+    </div>
+
+    <!-- Memory Grid -->
+    <div class="memories-grid">
+        <!-- Memory Card 1 - Photo -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #8B7355 0%, #6B5B4F 100%);">
+                [Historical Photo]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Emma Rodriguez at Douglas Aircraft Factory</h3>
+                <div class="memory-card-meta">
+                    📅 March 1943
+                </div>
+                <div class="memory-card-meta">
+                    📍 Long Beach, California
+                </div>
+                <div class="memory-card-meta">
+                    👤 Uploaded by Maria Chen, 2019
+                </div>
+                <p class="memory-card-snippet">
+                    Emma worked at the Douglas Aircraft factory during World War II. She was one of thousands of women who joined the workforce while men served overseas.
+                </p>
+            </div>
+        </div>
+
+        <!-- Memory Card 2 - Photo -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #C4A57B 0%, #9B8357 100%);">
+                [Wedding Photo]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Emma & Carlos Rodriguez Wedding Day</h3>
+                <div class="memory-card-meta">
+                    📅 June 15, 1946
+                </div>
+                <div class="memory-card-meta">
+                    📍 Los Angeles, California
+                </div>
+                <div class="memory-card-meta">
+                    👤 Uploaded by Robert Martinez, 2020
+                </div>
+                <p class="memory-card-snippet">
+                    Emma and Carlos were married at Our Lady of Guadalupe Church. The reception brought together family and friends from across Southern California.
+                </p>
+            </div>
+        </div>
+
+        <!-- Memory Card 3 - Document -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #A8A8A8 0%, #808080 100%);">
+                <div class="document-indicator">📄</div>
+                [Marriage Certificate]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Marriage Record of Emma Rodriguez & Carlos Rodriguez</h3>
+                <div class="memory-card-meta">
+                    📅 June 1946
+                </div>
+                <div class="memory-card-meta">
+                    📍 Los Angeles County, California
+                </div>
+                <div class="memory-card-meta">
+                    👤 Uploaded by Maria Chen, 2019
+                </div>
+                <p class="memory-card-snippet">
+                    Official marriage certificate documenting the union of Emma Rodriguez and Carlos Rodriguez.
+                </p>
+            </div>
+        </div>
+
+        <!-- Memory Card 4 - Photo -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #B8956A 0%, #8B7355 100%);">
+                [Family Photo]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Rodriguez Family at Their First Home</h3>
+                <div class="memory-card-meta">
+                    📅 December 1952
+                </div>
+                <div class="memory-card-meta">
+                    📍 East Los Angeles, California
+                </div>
+                <div class="memory-card-meta">
+                    👤 Uploaded by Maria Chen, 2019
+                </div>
+                <p class="memory-card-snippet">
+                    Emma with her children at their first home. By this time, the family had saved enough to purchase their own house.
+                </p>
+            </div>
+        </div>
+
+        <!-- Memory Card 5 - Story -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%);">
+                [Written Story]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Emma's Life Story: From Texas to California</h3>
+                <div class="memory-card-meta">
+                    📅 Written in 2019
+                </div>
+                <div class="memory-card-meta">
+                    👤 Written by Maria Chen
+                </div>
+                <p class="memory-card-snippet">
+                    Emma Rodriguez was born in 1922 in Texas and moved to Los Angeles as a teenager. During World War II, she answered the call to support the war effort...
+                </p>
+            </div>
+        </div>
+
+        <!-- Memory Card 6 - Photo -->
+        <div class="memory-card">
+            <div class="memory-card-image" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%);">
+                [Group Photo]
+            </div>
+            <div class="memory-card-content">
+                <h3 class="memory-card-title">Emma with Coworkers at Douglas Aircraft</h3>
+                <div class="memory-card-meta">
+                    📅 1943
+                </div>
+                <div class="memory-card-meta">
+                    📍 Long Beach, California
+                </div>
+                <div class="memory-card-meta">
+                    👤 Uploaded by Dorothy Martinez Estate, 2018
+                </div>
+                <p class="memory-card-snippet">
+                    Emma (center) with her friend Dorothy Martinez (left) and other women workers during their shift at the aircraft factory.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click handlers to cards (for mockup demo)
+        document.querySelectorAll('.memory-card').forEach(card => {
+            card.addEventListener('click', () => {
+                alert('In the actual prototype, this would navigate to the memory detail page.');
+            });
+        });
+    </script>
+</body>
+</html>
