@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FamilySearch Memories - Logged-Out Experience Prototypes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .prototypes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .prototype-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .prototype-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .prototype-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .badge-blue {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-green {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .prototype-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .prototype-desc {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .prototype-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .prototype-features li {
+            font-size: 14px;
+            color: #555;
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .prototype-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .prototype-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
+
+        .prototype-btn:hover {
+            opacity: 0.9;
+        }
+
+        .docs-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .docs-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .docs-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .docs-link {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .docs-link:hover {
+            background: #e0e0e0;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 FamilySearch Memories</h1>
+            <p>Logged-Out Experience Prototypes</p>
+        </div>
+
+        <div class="prototypes">
+            <div class="prototype-card">
+                <div class="prototype-badge badge-blue">Direction 1</div>
+                <h2 class="prototype-title">Trust-First Discovery</h2>
+                <p class="prototype-desc">
+                    Mission-driven approach that builds trust through radical openness. Account prompts emphasize community and contribution.
+                </p>
+                <ul class="prototype-features">
+                    <li>Silent initially (0-5 memories)</li>
+                    <li>Gentle indicators at 6+ memories</li>
+                    <li>Partnership invitation at 18+ min</li>
+                    <li>Content never gated</li>
+                    <li>Mission-focused messaging</li>
+                </ul>
+                <a href="prototype-trust-first.html" class="prototype-btn">View Prototype →</a>
+            </div>
+
+            <div class="prototype-card">
+                <div class="prototype-badge badge-green">Direction 2</div>
+                <h2 class="prototype-title">Progressive Features</h2>
+                <p class="prototype-desc">
+                    Feature-focused approach that demonstrates research capabilities progressively. Account value through tools and organization.
+                </p>
+                <ul class="prototype-features">
+                    <li>Feature hints from start</li>
+                    <li>Progressive tool demonstrations</li>
+                    <li>Visual feature mockups</li>
+                    <li>Capability-driven conversion</li>
+                    <li>Research-tool focused</li>
+                </ul>
+                <a href="prototype-progressive-features.html" class="prototype-btn">View Prototype →</a>
+            </div>
+        </div>
+
+        <div class="docs-card">
+            <h3 class="docs-title">📄 Documentation</h3>
+            <div class="docs-links">
+                <a href="flows.md" class="docs-link" target="_blank">User Journey Maps</a>
+                <a href="CLAUDE.md" class="docs-link" target="_blank">Project Context</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Low-fidelity interactive wireframes for exploration and testing</p>
+            <p style="margin-top: 5px;">Click through different interaction states to experience each flow</p>
+        </div>
+    </div>
+</body>
+</html>

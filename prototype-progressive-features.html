@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressive Features Prototype - FamilySearch Memories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .prototype-header {
+            background: #1e7e34;
+            color: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-bottom: 3px solid #155724;
+        }
+
+        .prototype-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .prototype-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .state-controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+        }
+
+        .state-controls h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .state-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .state-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .state-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .state-btn.active {
+            background: #1e7e34;
+            color: white;
+            border-color: #1e7e34;
+        }
+
+        .stats-bar {
+            background: #d1ecf1;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #0c5460;
+        }
+
+        .screen {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Search Results with Feature Hints */
+        .search-header {
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .search-meta {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .results-grid {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .memory-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .memory-card-image {
+            width: 100%;
+            height: 200px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .memory-card-content {
+            padding: 15px;
+        }
+
+        .memory-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .memory-card-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .memory-card-snippet {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Feature hint badge */
+        .save-hint {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: help;
+        }
+
+        .save-hint:hover::after {
+            content: 'Sign in to save';
+            position: absolute;
+            top: -30px;
+            right: 0;
+            background: #333;
+            padding: 5px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+
+        /* Feature Sidebar */
+        .detail-layout {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .detail-main {
+            flex: 1;
+        }
+
+        .feature-sidebar {
+            width: 280px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-item {
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-icon {
+            font-size: 16px;
+        }
+
+        .feature-badge {
+            background: #1e7e34;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: auto;
+        }
+
+        .learn-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #1e7e34;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .learn-more:hover {
+            text-decoration: underline;
+        }
+
+        /* Memory Detail */
+        .detail-container {
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #1e7e34;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .detail-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .detail-image {
+            width: 100%;
+            max-height: 500px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .detail-story {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .detail-metadata {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metadata-item {
+            font-size: 14px;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .metadata-value {
+            color: #333;
+        }
+
+        .metadata-value.clickable {
+            color: #1e7e34;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Feature Demo Box */
+        .feature-demo {
+            background: #e7f3ff;
+            border: 2px solid #1e7e34;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .demo-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .demo-preview {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+
+        .demo-timeline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            background: #1e7e34;
+            border-radius: 50%;
+        }
+
+        .demo-line {
+            flex: 1;
+            height: 2px;
+            background: #ccc;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .demo-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .demo-btn-primary {
+            background: #1e7e34;
+            color: white;
+        }
+
+        .demo-btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        /* Overlay Prompts */
+        .prompt-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .prompt-overlay.active {
+            display: flex;
+        }
+
+        .prompt-box {
+            background: white;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .prompt-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .prompt-message {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .prompt-visual {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .prompt-diagram {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .prompt-list {
+            margin: 10px 0 10px 20px;
+            line-height: 1.8;
+        }
+
+        .prompt-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .prompt-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .prompt-btn-primary {
+            background: #1e7e34;
+            color: white;
+        }
+
+        .prompt-btn-primary:hover {
+            background: #155724;
+        }
+
+        .prompt-btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .prompt-btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Wireframe annotations */
+        .wireframe-note {
+            background: #d1ecf1;
+            padding: 10px;
+            border-left: 3px solid #17a2b8;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #0c5460;
+        }
+
+        .feature-checklist {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .checkmark {
+            color: #1e7e34;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-header">
+        <h1>🧪 Direction 2: Progressive Feature Introduction Prototype</h1>
+        <p>Low-fidelity interactive wireframe - Feature hints early, capability showcases, tool-focused</p>
+    </div>
+
+    <div class="state-controls">
+        <h3>Interaction State Simulator:</h3>
+        <div class="state-buttons">
+            <button class="state-btn active" onclick="setState('search')">1. Search Results (Feature Hints)</button>
+            <button class="state-btn" onclick="setState('memory1')">2. First Memory (Feature Sidebar)</button>
+            <button class="state-btn" onclick="setState('timeline-demo')">3. Timeline Demo (3 memories)</button>
+            <button class="state-btn" onclick="setState('multihop')">4. Multi-hop Boundary (5 memories)</button>
+            <button class="state-btn" onclick="setState('collections')">5. Collections Showcase (11 memories)</button>
+            <button class="state-btn" onclick="setState('tools')">6. Research Tools (15 memories)</button>
+            <button class="state-btn" onclick="setState('save')">7. Save Attempt (Conversion)</button>
+        </div>
+        <div class="stats-bar" id="statsBar">
+            Memories viewed: 0 | Time elapsed: 0:00 | Current state: Search Results
+        </div>
+    </div>
+
+    <!-- Search Results with Feature Hints -->
+    <div class="screen active" id="screen-search">
+        <div class="search-header">
+            <input type="text" class="search-input" value="Thomas O'Brien Ireland immigration 1905" readonly>
+            <div class="search-meta">24 memories found</div>
+        </div>
+
+        <div class="results-grid">
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="save-hint">💾</div>
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    [Ship Manifest]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Thomas O'Brien</div>
+                    <div class="memory-card-meta">📅 April 1905</div>
+                    <div class="memory-card-meta">📍 Ellis Island, New York</div>
+                    <div class="memory-card-meta">👤 Uploaded by Kevin O'Brien, 2018</div>
+                    <div class="memory-card-snippet">Passenger manifest showing Thomas arriving from County Cork...</div>
+                </div>
+            </div>
+
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="save-hint">💾</div>
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    [Naturalization]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Thomas O'Brien</div>
+                    <div class="memory-card-meta">📅 March 1912</div>
+                    <div class="memory-card-meta">📍 New York City, New York</div>
+                    <div class="memory-card-meta">👤 Uploaded by Mary Sullivan, 2020</div>
+                    <div class="memory-card-snippet">Naturalization certificate - Thomas became a US citizen...</div>
+                </div>
+            </div>
+
+            <div class="memory-card" onclick="setState('memory1')">
+                <div class="save-hint">💾</div>
+                <div class="memory-card-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    [Family Photo]
+                </div>
+                <div class="memory-card-content">
+                    <div class="memory-card-title">Thomas O'Brien & Family</div>
+                    <div class="memory-card-meta">📅 June 1920</div>
+                    <div class="memory-card-meta">📍 Brooklyn, New York</div>
+                    <div class="memory-card-meta">👤 Uploaded by Kevin O'Brien, 2018</div>
+                    <div class="memory-card-snippet">Thomas with wife Margaret and three children...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Progressive Features Approach:</strong> Search results include subtle feature hints (save icon with tooltip). Creates early awareness that organization features exist. Non-blocking, informational.
+        </div>
+    </div>
+
+    <!-- Memory Detail with Feature Sidebar -->
+    <div class="screen" id="screen-memory1">
+        <div class="detail-layout">
+            <div class="detail-main">
+                <div class="detail-container">
+                    <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+                    <h1 class="detail-title">Thomas O'Brien</h1>
+                    <p class="detail-subtitle">Passenger Manifest, April 1905</p>
+
+                    <div class="detail-image">
+                        [High-Resolution Ship Manifest - Fully Viewable]
+                    </div>
+
+                    <div class="detail-story">
+                        <strong>Complete Document - Fully Accessible:</strong><br><br>
+                        Thomas O'Brien departed from Queenstown, County Cork, Ireland on the ship "Celtic" bound for New York. He was 23 years old, traveling alone, with plans to join his brother Michael who had immigrated two years earlier. The manifest lists his occupation as "laborer" and shows he carried $12 when he arrived at Ellis Island on April 18, 1905.
+                    </div>
+
+                    <div class="detail-metadata">
+                        <div class="metadata-item">
+                            <div class="metadata-label">Date</div>
+                            <div class="metadata-value">April 18, 1905</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">Location</div>
+                            <div class="metadata-value">Ellis Island, New York</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">Origin</div>
+                            <div class="metadata-value">County Cork, Ireland</div>
+                        </div>
+                        <div class="metadata-item">
+                            <div class="metadata-label">Document Type</div>
+                            <div class="metadata-value">Ship Manifest</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Sidebar -->
+            <div class="feature-sidebar">
+                <h3 class="sidebar-title">Research Tools Available</h3>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📚</span>
+                    <span>Save to Collections</span>
+                    <span class="feature-badge">Sign in</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span>Build Timeline</span>
+                    <span class="feature-badge">Sign in</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🔗</span>
+                    <span>Connect to Tree</span>
+                    <span class="feature-badge">Sign in</span>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">⬇️</span>
+                    <span>Download High-Res</span>
+                    <span class="feature-badge">Sign in</span>
+                </div>
+
+                <a href="#" class="learn-more" onclick="alert('Would show feature demo'); return false;">Learn More →</a>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>First Memory:</strong> Feature sidebar introduces available tools (non-blocking). Content fully accessible. Creates awareness of capabilities without pressure. User can click "Learn More" for details.
+        </div>
+    </div>
+
+    <!-- Timeline Demo Screen -->
+    <div class="screen" id="screen-timeline-demo">
+        <div class="detail-container">
+            <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+            <h1 class="detail-title">Thomas O'Brien & Family</h1>
+            <p class="detail-subtitle">Family Photo, June 1920</p>
+
+            <div class="detail-image">
+                [High-Resolution Family Photo - Fully Viewable]
+            </div>
+
+            <div class="detail-story">
+                <strong>Complete Story - Fully Accessible:</strong><br><br>
+                Thomas O'Brien with his wife Margaret and their three children at their home in Brooklyn, June 1920. By this time, Thomas had established himself as a skilled carpenter and the family had saved enough to purchase their first home. This photo represents the realization of Thomas's American dream - fifteen years after arriving at Ellis Island with just $12 to his name.
+            </div>
+
+            <!-- Timeline Feature Demo -->
+            <div class="feature-demo">
+                <div class="demo-title">These memories span 1905-1920</div>
+                <div class="demo-subtitle">See Thomas's journey visualized</div>
+
+                <div class="demo-preview">
+                    <div class="demo-timeline">
+                        <div>
+                            <div class="demo-dot"></div>
+                            <div style="font-size: 11px; margin-top: 5px;">1905</div>
+                        </div>
+                        <div class="demo-line"></div>
+                        <div>
+                            <div class="demo-dot"></div>
+                            <div style="font-size: 11px; margin-top: 5px;">1912</div>
+                        </div>
+                        <div class="demo-line"></div>
+                        <div>
+                            <div class="demo-dot"></div>
+                            <div style="font-size: 11px; margin-top: 5px;">1920</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Arrival → Citizenship → Family
+                    </div>
+                </div>
+
+                <div class="demo-subtitle" style="margin-bottom: 10px;">
+                    Sign in to build complete timelines, map relationships, and organize your research.
+                </div>
+
+                <div class="demo-actions">
+                    <button class="demo-btn demo-btn-primary">Create Free Account</button>
+                    <button class="demo-btn demo-btn-secondary" onclick="setState('memory1')">Dismiss</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>3 Chronological Memories:</strong> Timeline feature demonstrated contextually with visual preview. Shows concrete value of timeline building. Can dismiss and continue browsing. Educational, not blocking.
+        </div>
+    </div>
+
+    <!-- Multi-hop Navigation Boundary -->
+    <div class="screen" id="screen-multihop">
+        <div class="detail-container">
+            <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+            <h1 class="detail-title">Margaret O'Brien</h1>
+            <p class="detail-subtitle">Wife of Thomas O'Brien</p>
+
+            <div class="detail-story" style="background: #f0f8ff; border-left: 3px solid #1e7e34;">
+                <strong>Margaret O'Brien Profile</strong><br>
+                1884 - 1965<br>
+                Married to Thomas O'Brien, 1910<br><br>
+                <em>7 public memories available</em>
+            </div>
+
+            <div class="detail-metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">Connection</div>
+                    <div class="metadata-value">Wife of Thomas O'Brien</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Children</div>
+                    <div class="metadata-value clickable" onclick="showPrompt('multihop')">Patrick O'Brien, Mary O'Brien, James O'Brien</div>
+                </div>
+            </div>
+
+            <div class="wireframe-note" style="margin-top: 20px;">
+                <strong>Scenario:</strong> User navigated from Thomas → Margaret (one-hop, free). Clicking children (two-hop: Thomas → Margaret → Patrick) triggers boundary with visual diagram.
+            </div>
+        </div>
+    </div>
+
+    <!-- Collections Showcase Screen -->
+    <div class="screen" id="screen-collections">
+        <div class="detail-container">
+            <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+            <h1 class="detail-title">Thomas's Naturalization Certificate</h1>
+            <p class="detail-subtitle">March 1912</p>
+
+            <div class="detail-image">
+                [High-Resolution Naturalization Document]
+            </div>
+
+            <!-- Collections Feature Showcase -->
+            <div class="feature-demo">
+                <div class="demo-title">You're building a research collection</div>
+                <div class="demo-subtitle">You've viewed 11 memories across 3 people spanning 1905-1930</div>
+
+                <div class="demo-preview">
+                    <div style="font-size: 13px; color: #666; text-align: center;">
+                        📚 Collection Preview:<br>
+                        <strong>"Thomas O'Brien Research"</strong><br><br>
+                        [Visual mockup showing organized memories]<br>
+                        - Immigration (3 memories)<br>
+                        - Family Life (5 memories)<br>
+                        - Documents (3 memories)
+                    </div>
+                </div>
+
+                <div class="demo-subtitle" style="margin-top: 15px;">
+                    <strong>With a free account you can:</strong>
+                </div>
+                <ul class="prompt-list" style="font-size: 14px;">
+                    <li>Save memories to collections</li>
+                    <li>Organize by person, date, or theme</li>
+                    <li>Add research notes and tags</li>
+                    <li>Share collections with family</li>
+                </ul>
+
+                <div style="background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 13px;">
+                    💡 We'll save everything you've explored today as your first collection.
+                </div>
+
+                <div class="demo-actions">
+                    <button class="demo-btn demo-btn-primary">Create Free Account</button>
+                    <button class="demo-btn demo-btn-secondary" onclick="setState('memory1')">Continue Browsing</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>11 Memories Viewed:</strong> Collections feature showcased with visual mockup. Addresses pain point (losing track of research). "Research journal" promise included. More prominent than earlier hints (progression). Multiple benefits listed.
+        </div>
+    </div>
+
+    <!-- Research Tools Showcase Screen -->
+    <div class="screen" id="screen-tools">
+        <div class="detail-container">
+            <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+
+            <!-- Advanced Research Tools Showcase -->
+            <div class="feature-demo" style="border-color: #1e7e34; background: #f0fff4;">
+                <div class="demo-title">Unlock powerful research tools</div>
+                <div class="demo-subtitle">You're exploring complex family connections. Free research tools help you:</div>
+
+                <div class="demo-preview" style="margin-bottom: 15px;">
+                    <strong style="display: block; margin-bottom: 8px;">📊 Timeline Builder</strong>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Visualize 15 memories across 25 years. Spot gaps and patterns in family history.
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 4px; color: #999;">
+                        [Timeline visualization mockup]
+                    </div>
+                </div>
+
+                <div class="demo-preview" style="margin-bottom: 15px;">
+                    <strong style="display: block; margin-bottom: 8px;">🗺️ Relationship Mapper</strong>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        Explore how Thomas, Margaret, and 8 others connect. Navigate family networks visually.
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 4px; color: #999;">
+                        [Relationship diagram mockup]
+                    </div>
+                </div>
+
+                <div class="demo-preview">
+                    <strong style="display: block; margin-bottom: 8px;">🔍 Cross-Collection Search</strong>
+                    <div style="font-size: 13px; color: #666;">
+                        Search across millions of memories to find more O'Brien family connections.
+                    </div>
+                </div>
+
+                <div class="demo-actions" style="margin-top: 20px;">
+                    <button class="demo-btn demo-btn-primary">Create Free Account</button>
+                    <button class="demo-btn demo-btn-secondary" onclick="setState('memory1')">Dismiss</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>15 Memories Viewed:</strong> Advanced research tools showcased with visual mockups. Multiple tools presented together. Appeals to researcher mindset. Concrete demonstrations show value. Progression: started with hints, now full tool showcase.
+        </div>
+    </div>
+
+    <!-- Save Attempt - Conversion Screen -->
+    <div class="screen" id="screen-save">
+        <div class="detail-container">
+            <a href="#" class="back-link" onclick="setState('search'); return false;">← Back to search results</a>
+            <h1 class="detail-title">Thomas O'Brien's Diary Entry</h1>
+            <p class="detail-subtitle">Written in 1915</p>
+
+            <div class="detail-image">
+                [Diary Entry Document]
+            </div>
+
+            <div class="detail-story">
+                <strong>Complete diary entry - fully readable:</strong><br><br>
+                "It has been ten years since I arrived in America. I think of that young man who stepped off the ship with nothing but hope and $12 in his pocket..."
+            </div>
+
+            <div class="wireframe-note">
+                <strong>Scenario:</strong> User clicks "Save" button to bookmark this memory for later analysis.
+            </div>
+        </div>
+    </div>
+
+    <!-- Multi-hop Navigation Prompt -->
+    <div class="prompt-overlay" id="multihopPrompt">
+        <div class="prompt-box">
+            <div class="prompt-title">You're exploring extended family connections</div>
+
+            <div class="prompt-visual">
+                <div class="prompt-diagram">
+                    Thomas O'Brien → Margaret O'Brien → Patrick O'Brien
+                </div>
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                    (You are here: 2 hops)
+                </div>
+            </div>
+
+            <div class="prompt-message">
+                You can view direct relationships freely. Create a free account to:
+                <ul class="prompt-list">
+                    <li>Navigate extended family networks</li>
+                    <li>Build relationship maps</li>
+                    <li>Discover connection pathways</li>
+                </ul>
+            </div>
+
+            <div class="prompt-buttons">
+                <button class="prompt-btn prompt-btn-primary">Create Free Account</button>
+                <button class="prompt-btn prompt-btn-secondary" onclick="hidePrompt('multihop')">Return to Browsing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Conversion Prompt -->
+    <div class="prompt-overlay" id="savePrompt">
+        <div class="prompt-box">
+            <div class="prompt-title">Save and organize your research</div>
+
+            <div class="prompt-message">
+                You've discovered 18 memories of Thomas O'Brien and family. Create a free account to:
+            </div>
+
+            <div class="feature-checklist">
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Save these 18 memories to your collection</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Organize and tag your discoveries</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Build timelines and relationship maps</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Download documents and images</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Continue research across devices</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checkmark">✓</span>
+                    <span>Contribute your own family memories</span>
+                </div>
+            </div>
+
+            <div style="background: #fff3cd; padding: 12px; border-radius: 4px; margin: 15px 0; font-size: 14px;">
+                💡 Everything you've explored today will be saved when you sign in.
+            </div>
+
+            <div class="prompt-buttons">
+                <button class="prompt-btn prompt-btn-primary">Create Free Account</button>
+                <button class="prompt-btn prompt-btn-secondary" onclick="hidePrompt('save')">Continue Browsing</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const states = {
+            'search': { screen: 'screen-search', memories: 0, time: '0:00', desc: 'Search Results (Feature Hints)' },
+            'memory1': { screen: 'screen-memory1', memories: 1, time: '1:00', desc: 'First Memory (Feature Sidebar)' },
+            'timeline-demo': { screen: 'screen-timeline-demo', memories: 3, time: '3:30', desc: 'Timeline Demo' },
+            'multihop': { screen: 'screen-multihop', memories: 5, time: '6:00', desc: 'Multi-hop Boundary' },
+            'collections': { screen: 'screen-collections', memories: 11, time: '12:00', desc: 'Collections Showcase' },
+            'tools': { screen: 'screen-tools', memories: 15, time: '15:00', desc: 'Research Tools' },
+            'save': { screen: 'screen-save', memories: 18, time: '18:00', desc: 'Save Attempt (Conversion)' }
+        };
+
+        function setState(stateKey) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+            // Hide all prompts
+            document.querySelectorAll('.prompt-overlay').forEach(p => p.classList.remove('active'));
+
+            // Update button states
+            document.querySelectorAll('.state-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show appropriate screen
+            const state = states[stateKey];
+            document.getElementById(state.screen).classList.add('active');
+
+            // Show appropriate prompts based on state
+            if (stateKey === 'save') {
+                document.getElementById('savePrompt').classList.add('active');
+            } else if (stateKey === 'multihop') {
+                // Multihop state doesn't auto-show prompt, only clicking children link does
+            }
+
+            // Update stats bar
+            document.getElementById('statsBar').textContent =
+                `Memories viewed: ${state.memories} | Time elapsed: ${state.time} | Current state: ${state.desc}`;
+        }
+
+        function showPrompt(promptName) {
+            document.getElementById(promptName + 'Prompt').classList.add('active');
+        }
+
+        function hidePrompt(promptName) {
+            document.getElementById(promptName + 'Prompt').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
